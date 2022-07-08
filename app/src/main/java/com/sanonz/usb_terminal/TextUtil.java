@@ -1,5 +1,7 @@
-package de.kai_morich.simple_usb_terminal;
+package com.sanonz.serial;
 
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
@@ -10,7 +12,12 @@ import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 final class TextUtil {
 
@@ -18,6 +25,7 @@ final class TextUtil {
 
     final static String newline_crlf = "\r\n";
     final static String newline_lf = "\n";
+    final static String newline_none = "";
 
     static byte[] fromHexString(final CharSequence s) {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
@@ -150,6 +158,28 @@ final class TextUtil {
                 self = false;
             }
         }
+    }
+
+
+    static String loadFileContent(Context ctx, String filename) {
+        StringBuilder sb = new StringBuilder();
+        AssetManager am = ctx.getAssets();
+
+        try {
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(am.open(filename), "utf-8")
+            );
+
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
     }
 
 }

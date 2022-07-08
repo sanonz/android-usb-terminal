@@ -1,0 +1,77 @@
+[
+  [{
+    "name": "Car Commands"
+  }],
+
+  [{
+    "name": "Get UID",
+    "value": "01 01"
+  }, {
+    "name": "Get Version",
+    "value": "01 02"
+  }, {
+    "name": "Get Status",
+    "value": "01 03"
+  }, {
+    "name": "Get Error",
+    "value": "01 04"
+  }, {
+    "name": "Get Message",
+    "value": "01 05"
+  }, {
+    "name": "Get Tasks",
+    "value": "01 06"
+  }],
+
+  [{
+    "name": "Init",
+    "value": "01 07"
+  }, {
+    "name": "Charge",
+    "value": "01 08"
+  }, {
+    "name": "Stop Action",
+    "value": "01 09"
+  }, {
+    "name": "{{ Reboot }}",
+    "value": "01 0A"
+  }],
+
+  [{
+    "name": "Move Up",
+    "value": "01 0B 4E 20"
+  }, {
+    "name": "Move Down",
+    "value": "01 0C 4E 20"
+  }, {
+    "name": "Stop Move",
+    "value": "01 0D"
+  }, {
+    "name": "Open  Door",
+    "value": "01 0E"
+  }, {
+    "name": "Close Door",
+    "value": "01 0F"
+  }, {
+    "name": "Rotate",
+    "value": "01 10"
+  }],
+
+  [{
+    "name": "Cabinet Command"
+  }],
+
+  [{
+    "name": "Check",
+    "value": "02 00"
+  }, {
+    "name": "Open Door",
+    "value": "02 0E"
+  }, {
+    "name": "Close Door",
+    "value": "02 0F"
+  }, {
+    "name": "{{ Reboot }}",
+    "value": "02 14"
+  }]
+]

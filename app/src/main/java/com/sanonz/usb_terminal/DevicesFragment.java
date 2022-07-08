@@ -1,4 +1,4 @@
-package de.kai_morich.simple_usb_terminal;
+package com.sanonz.serial;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -42,7 +42,7 @@ public class DevicesFragment extends ListFragment {
 
     private final ArrayList<ListItem> listItems = new ArrayList<>();
     private ArrayAdapter<ListItem> listAdapter;
-    private int baudRate = 19200;
+    private int baudRate = 115200;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

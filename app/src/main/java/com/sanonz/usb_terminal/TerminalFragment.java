@@ -1,4 +1,4 @@
-package de.kai_morich.simple_usb_terminal;
+package com.sanonz.serial;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,12 +21,14 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.ForegroundColorSpan;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,8 +43,15 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TerminalFragment extends Fragment implements ServiceConnection, SerialListener {
 
@@ -60,10 +69,13 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
     private Connected connected = Connected.False;
     private boolean initialStart = true;
-    private boolean hexEnabled = false;
+    private boolean hexEnabled = true;
     private boolean controlLinesEnabled = false;
     private boolean pendingNewline = false;
-    private String newline = TextUtil.newline_crlf;
+    private String newline = TextUtil.newline_none;
+
+    private LinearLayout quickView;
+    private ArrayList<Map<String, String>> quickItems = new ArrayList<>();
 
     public TerminalFragment() {
         broadcastReceiver = new BroadcastReceiver() {
@@ -105,6 +117,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             service.attach(this);
         else
             getActivity().startService(new Intent(getActivity(), SerialService.class)); // prevents service destroy on unbind from recreated activity caused by orientation change
+
+        fillQuickButtons();
     }
 
     @Override
@@ -181,6 +195,9 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         View sendBtn = view.findViewById(R.id.send_btn);
         sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
         controlLines = new ControlLines(view);
+
+        quickView = view.findViewById(R.id.quick_btns);
+
         return view;
     }
 
@@ -238,6 +255,121 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    /*
+     * Fill buttons
+     */
+    private void fillQuickButtons() {
+        JSONArray json;
+        int count = 0;
+        Button button;
+        TextView label;
+        LinearLayout section;
+        LinearLayout column = new LinearLayout(getActivity());
+        JSONArray rows;
+        JSONObject row;
+
+
+        try {
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            LinearLayout.LayoutParams blp = new LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    0.33f
+            );
+            json = new JSONArray(TextUtil.loadFileContent(getActivity(), "quickButtons.json"));
+
+            for (int o = 0; o < json.length(); o++) {
+                rows = json.getJSONArray(o);
+
+                section = new LinearLayout(getActivity());
+                section.setLayoutParams(lp);
+                section.setOrientation(LinearLayout.VERTICAL);
+                section.setPadding(0, 0, 0, 40);
+
+                for (int i = 0; i < rows.length(); i++) {
+                    row = rows.getJSONObject(i);
+
+                    if (i%3 == 0) {
+                        column = new LinearLayout(getActivity());
+                        column.setLayoutParams(lp);
+                        column.setOrientation(LinearLayout.HORIZONTAL);
+                    }
+
+                    if (row.has("value")) {
+                        button = new Button(getActivity());
+                        button.setId(count);
+                        button.setText(row.optString("name"));
+                        button.setAllCaps(false);
+                        button.setLayoutParams(blp);
+                        button.setOnClickListener(this::onQuickClick);
+                        button.setOnLongClickListener(this::onLongQuickClick);
+                        column.addView(button);
+                    } else {
+                        section.setPadding(0, 0, 0, 20);
+                        label = new TextView(getActivity());
+                        label.setText(row.optString("name"));
+                        label.setPadding(10, 20, 0, 0);
+                        column.addView(label);
+                    }
+
+                    if (i%3 == 0) {
+                        section.addView(column);
+                    }
+
+                    Map<String, String> quickItem = new HashMap<>();
+                    quickItem.put("name", row.optString("name"));
+                    quickItem.put("value", row.optString("value"));
+                    quickItems.add(quickItem);
+
+                    ++count;
+                }
+                quickView.addView(section);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Nullable
+    private String getQuickItem(int index) {
+        if (quickItems.isEmpty()) {
+            return null;
+        }
+
+        Map<String, String> quickItem = quickItems.get(index);
+
+        if (quickItem.isEmpty()) {
+            return null;
+        }
+
+        return quickItem.get("value");
+    }
+
+    private void onQuickClick(View view) {
+        String quickItem = getQuickItem(view.getId());
+
+        if (quickItem == null) {
+            return;
+        }
+
+        send(quickItem);
+    }
+
+    private boolean onLongQuickClick(View view) {
+        String quickItem = getQuickItem(view.getId());
+
+        if (quickItem == null) {
+            return false;
+        }
+
+        sendText.setText(quickItem);
+
+        return true;
     }
 
     /*

@@ -87,12 +87,31 @@
     <TextView
         android:id="@+id/receive_text"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="400dp"
         android:layout_weight="1"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textSize="12dp"
         android:freezesText="true"
+        android:includeFontPadding="false"
         android:gravity="bottom"
         android:scrollbars="vertical"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <View
+        android:layout_width="match_parent"
+        android:background="?android:attr/listDivider"
+        android:layout_height="2dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="159dp">
+        <LinearLayout
+            android:id="@+id/quick_btns"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+    </ScrollView>
 
     <View
         android:layout_width="match_parent"

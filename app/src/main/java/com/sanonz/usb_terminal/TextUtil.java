@@ -1,6 +1,7 @@
 package com.sanonz.serial;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.text.Editable;
 import android.text.InputType;
@@ -180,6 +181,18 @@ final class TextUtil {
         }
 
         return sb.toString();
+    }
+
+    static String getAppMetaDataString(Context context, String metaName, String defaultValue) {
+        try {
+            String value = context.getPackageManager()
+                    .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA)
+                    .metaData.getString(metaName, defaultValue);
+            return value;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return defaultValue;
+        }
     }
 
 }

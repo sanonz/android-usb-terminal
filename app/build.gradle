@@ -23,6 +23,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    flavorDimensions "version"
+    productFlavors {
+        device1 {
+            dimension "version"
+            applicationIdSuffix ".qb1"
+            manifestPlaceholders = [APP_NAME: "Device 1", QUICK_BTN_FILE: "quickButtons.json"]
+        }
+        device2 {
+            dimension "version"
+            applicationIdSuffix ".qb2"
+            manifestPlaceholders = [APP_NAME: "Device 2", QUICK_BTN_FILE: "quickButtons2.json"]
+        }
+    }
 }
 
 dependencies {

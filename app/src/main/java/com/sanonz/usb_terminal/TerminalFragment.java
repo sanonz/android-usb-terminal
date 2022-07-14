@@ -42,6 +42,7 @@ import com.hoho.android.usbserial.driver.SerialTimeoutException;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.sanonz.serial.TextUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -269,7 +270,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         LinearLayout column = new LinearLayout(getActivity());
         JSONArray rows;
         JSONObject row;
-
+        String filename = TextUtil.getAppMetaDataString(getActivity(), "QUICK_BTN_FILE", "quickButtons.json");
 
         try {
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -281,7 +282,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     0.33f
             );
-            json = new JSONArray(TextUtil.loadFileContent(getActivity(), "quickButtons.json"));
+            json = new JSONArray(TextUtil.loadFileContent(getActivity(), filename));
 
             for (int o = 0; o < json.length(); o++) {
                 rows = json.getJSONArray(o);
@@ -306,6 +307,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
                         button.setText(row.optString("name"));
                         button.setAllCaps(false);
                         button.setLayoutParams(blp);
+                        button.setMinWidth(0);
+                        button.setPadding(0, 0, 0, 0);
                         button.setOnClickListener(this::onQuickClick);
                         button.setOnLongClickListener(this::onLongQuickClick);
                         column.addView(button);
